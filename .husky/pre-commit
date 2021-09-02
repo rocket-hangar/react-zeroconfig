@@ -3,12 +3,6 @@
 
 yarn run markdown-source-import README.md --git-add
 
-cp README.md packages/src/@rocket-scripts/web/README.md
-git add packages/src/@rocket-scripts/web/README.md
-
-cp README.md packages/src/@rocket-scripts/electron/README.md
-git add packages/src/@rocket-scripts/electron/README.md
-
 yarn run lint-staged
 
 yarn workspace packages run precommit

@@ -1,3 +1,4 @@
+// @ts-ignore
 import svgToJsx from '@svgr/plugin-jsx';
 import fs from 'fs';
 

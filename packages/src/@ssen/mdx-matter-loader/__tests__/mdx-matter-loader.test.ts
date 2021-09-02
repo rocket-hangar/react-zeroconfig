@@ -3,16 +3,18 @@ import matterLoader from '@ssen/mdx-matter-loader';
 function compile(source: string): Promise<string | Buffer | undefined> {
   return new Promise<string | Buffer | undefined>((resolve, reject) => {
     const context = {
-      async: () => (
-        err: Error | null | undefined,
-        content: string | Buffer | undefined,
-      ) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(content);
-        }
-      },
+      async:
+        () =>
+        (
+          err: Error | null | undefined,
+          content: string | Buffer | undefined,
+        ) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(content);
+          }
+        },
     };
 
     matterLoader.call(context, source);

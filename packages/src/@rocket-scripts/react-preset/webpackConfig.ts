@@ -1,6 +1,3 @@
-import { eslintConfigExistsSync } from '@rocket-scripts/utils/eslintConfigExistsSync';
-import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
-import fs from 'fs-extra';
 import path from 'path';
 import { Configuration, RuleSetRule, WatchIgnorePlugin } from 'webpack';
 import { getWebpackDataURILoaders } from './webpackLoaders/getWebpackDataURILoaders';
@@ -20,9 +17,7 @@ export interface WebpackConfigOptions {
   chunkPath: string;
   publicPath: string;
   esbuildLoaderOptions: ESBuildLoaderOptions;
-  tsconfig: string;
   extractCss: boolean;
-  tsConfigIncludes: string[];
 }
 
 export default function ({
@@ -30,9 +25,7 @@ export default function ({
   chunkPath,
   publicPath,
   esbuildLoaderOptions,
-  tsconfig,
   extractCss,
-  tsConfigIncludes,
 }: WebpackConfigOptions): Configuration {
   return {
     resolve: {
@@ -44,31 +37,6 @@ export default function ({
       strictExportPresence: true,
 
       rules: [
-        // enable eslint-loader if exists
-        ...(() => {
-          try {
-            return eslintConfigExistsSync(cwd)
-              ? [
-                  {
-                    test: /\.(js|mjs|jsx|ts|tsx)$/,
-                    include: path.join(cwd, 'src'),
-                    enforce: 'pre',
-                    use: [
-                      {
-                        loader: require.resolve('eslint-loader'),
-                        options: {
-                          eslintPath: require.resolve('eslint'),
-                          cwd,
-                        },
-                      },
-                    ],
-                  } as RuleSetRule,
-                ]
-              : [];
-          } catch {
-            return [];
-          }
-        })(),
         {
           oneOf: [
             // convert small image files to data uri
@@ -144,33 +112,6 @@ export default function ({
 
     plugins: [
       new WatchIgnorePlugin({ paths: [path.join(cwd, 'node_modules')] }),
-
-      ...(fs.existsSync(tsconfig)
-        ? [
-            new ForkTsCheckerWebpackPlugin({
-              async: false,
-              typescript: {
-                configFile: tsconfig,
-                diagnosticOptions: {
-                  semantic: true,
-                  syntactic: true,
-                },
-                configOverwrite: {
-                  compilerOptions: {
-                    incremental: true,
-                  },
-                  include: tsConfigIncludes,
-                },
-              },
-              formatter: {
-                type: 'codeframe',
-                options: {
-                  highlightCode: false,
-                },
-              },
-            }),
-          ]
-        : []),
     ],
   };
 }
